@@ -1,0 +1,76 @@
+collections.counter()
+Default Dictionary
+
+
+i have completed:
+permutations
+
+yet to finish:
+alphabet rangoli
+collections.counter
+
+package main
+
+import (
+	"database/sql"
+	"fmt"
+	"io/ioutil"
+	"strings"
+
+	_ "github.com/lib/pq"
+	"github.com/spf13/viper"
+)
+
+var (
+	//assigning a variable to the sql
+	DB *sql.DB
+)
+
+func connect() *sql.DB {
+
+	fmt.Println("Connection establishing.....") //reading the Json file
+	viper.SetConfigName("configDb")             //filename
+	viper.SetConfigType("json")                 //file type
+	viper.AddConfigPath(".")                    //adding path
+
+	fmt.Println("Reading Json file.....")
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(fmt.Errorf("Fatal error:Unable to read the file:%w \n", err))
+	}
+	//contents in the Json file
+	user := viper.GetString("user")
+	password := viper.GetString("password")
+	host := viper.GetString("host")
+	port := viper.GetString("port")
+	dbname := viper.GetString("dbname")
+	//assinging the contents to a single variable
+	psqlInfo := "host=" + host + "port=" + port + "user=" + user + "password=" + password + "sslmode=disable"
+	fmt.Printf(psqlInfo)
+	db, err := sql.Open("postgress", psqlInfo)
+	if err != nil {
+		fmt.Printf("Check your database, it is unable to connect...")
+		return nil
+	}
+	// reading the database
+	_, err = db.Exec("create database" + dbname)
+	configinfodb := psqlInfo + "database" + dbname
+	db2, err := sql.Open("postgres", configinfodb)
+	file, err := ioutil.ReadFile("./dbschema.sql")
+	requests := strings.Split(string(file), ";")
+	for _, request := range requests {
+		result, err := db2.Exec(request)
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println(result)
+	}
+	defer db.Close()
+
+	DB = db2
+	return DB
+}
+
+func main() {
+	connect()
+}

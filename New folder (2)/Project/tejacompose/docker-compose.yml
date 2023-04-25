@@ -1,0 +1,22 @@
+version: '2'
+services:
+    frontend:
+      image: tejavardhan/fend:latest
+      container_name: frontendimage
+      restart: always
+      expose:
+        - 88
+      ports:
+        - 88:80
+    
+    backend:
+      image: tejavardhan/bend:latest
+      container_name: backendimage
+      restart: always
+      command: python -m flask run
+      expose:
+        - 5000
+      ports:
+        - 5000:5000
+        
+      

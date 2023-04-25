@@ -1,0 +1,3 @@
+* docker,kubernetes,f-end,golang
+* Is hardware to be designed to handle the virtualmachine??
+* x86 architecture
